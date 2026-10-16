@@ -1,0 +1,25 @@
+{
+  "name": "RIT Re-Exam Scheduling System",
+  "short_name": "RIT Re-Exam",
+  "description": "Automated conflict-free re-examination timetable management system for Rajarambapu Institute of Technology.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f4f7fb",
+  "theme_color": "#172554",
+  "orientation": "portrait-primary",
+  "lang": "en-IN",
+  "categories": [
+    "education",
+    "productivity",
+    "business"
+  ],
+  "icons": [
+    {
+      "src": "/static/icons/rit-scheduler.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+
+# Private application data
+instance/
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*.pyc
+
+# Virtual environments
+.venv/
+venv/
+
+# Generated files and user uploads
+generated_schedules/
+uploads/
+
+# Local development files
+.vscode/
+

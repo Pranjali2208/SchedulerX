@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<defs><linearGradient id="g" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#172554"/><stop offset="1" stop-color="#4f46e5"/></linearGradient></defs>
+<rect width="512" height="512" rx="112" fill="url(#g)"/>
+<rect x="58" y="58" width="396" height="396" rx="88" fill="none" stroke="#fff" stroke-opacity=".22" stroke-width="10"/>
+<text x="185" y="230" text-anchor="middle" font-family="Arial,sans-serif" font-weight="900" font-size="82" fill="#fff">RIT</text>
+<path d="M88 278h194" stroke="#c7d2fe" stroke-width="10" stroke-linecap="round"/>
+<path d="M350 165c-38 0-69 31-69 69v35l-16 25h170l-16-25v-35c0-38-31-69-69-69z" fill="#fff"/>
+<path d="M334 315c4 15 18 25 34 25s30-10 34-25" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round"/>
+<circle cx="418" cy="154" r="20" fill="#fbbf24" stroke="#fff" stroke-width="7"/>
+<text x="185" y="375" text-anchor="middle" font-family="Arial,sans-serif" font-weight="700" font-size="31" fill="#fff">RE-EXAM</text>
+</svg>

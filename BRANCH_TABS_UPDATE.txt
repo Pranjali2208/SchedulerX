@@ -1,0 +1,12 @@
+BRANCH-WISE EXCEL EXPORT UPDATE
+
+The downloaded generated_reexam_timetable.xlsx remains ONE Excel workbook.
+It contains:
+1. Timetable - complete sorted exam schedule
+2. Student Roster - detailed student roster
+3. One tab for each branch found in the uploaded/cleaned database
+
+Each branch tab contains only that branch's exam schedule.
+The branch tabs are inside the same Excel workbook (not separate Excel files).
+
+Afternoon timing remains 02.30pm to 05.30pm.

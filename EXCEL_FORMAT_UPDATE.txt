@@ -1,0 +1,15 @@
+EXCEL FORMAT UPDATE (COURSE + ACADEMIC YEAR TABS)
+
+1. The downloaded timetable remains ONE Excel workbook.
+2. The workbook contains:
+   - Timetable (complete sorted schedule - unchanged)
+   - Student Roster (unchanged)
+   - One tab for each unique course + academic year found in the generated
+     timetable's "Class" column, e.g. "Third Year B.Tech." -> "B.Tech - Third Year".
+3. Each course/year tab holds only that class's papers, with the same columns
+   as the Timetable sheet, a title block, merged Day & Date / Time cells (as in
+   the ESE reference timetable), borders, frozen header and landscape print setup.
+4. A paper shared by several classes (Class cell lists more than one) appears on
+   each of those class tabs; no scheduled paper is dropped.
+5. Tab names are sanitised (no \ / * ? : [ ], max 31 chars, unique).
+6. Only the Excel export in scheduler.py changed; scheduling is untouched.
