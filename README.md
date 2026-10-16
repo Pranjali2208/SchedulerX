@@ -93,3 +93,5 @@ For scanned PDFs and PNG/JPEG OCR, install the **Tesseract OCR application** on 
 
 ## Draft / Final timetable title
 The administrator can choose **Draft Time Table** or **Final Time Table** in the generator dashboard. The selected title is saved with the generated schedule and is applied to both PDF and Word exports. Older schedules default to Draft. Non-administrator accounts cannot publish a timetable as Final.
+# SchedulerX
+Re-Exam Timetable generator
