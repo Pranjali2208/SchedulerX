@@ -316,7 +316,7 @@ def _header_info(dates, academic_year=None, semester=None, summary="", timetable
             "timetable_status": "Final Time Table" if str(timetable_status).lower() == "final" else "Draft Time Table"}
 
 
-def build_model(rows, academic_year=None, semester=None, timetable_status="draft"):
+def build_model(rows, academic_year=None, semester=None, timetable_status="draft", exam_type=None):
     """rows: header row + 8 columns (Day & Date, Time, Branch, Class, Sem, Course Name, Code, Count)."""
     entries, dates = [], []
     for index, row in enumerate(rows[1:]):
