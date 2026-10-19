@@ -19,6 +19,7 @@
 body{background:var(--bg);color:#0f172a;min-height:100vh}
 button,input,select{font:inherit}button{cursor:pointer}
 .hidden{display:none!important}
+  
 
 /* LOGIN */
 .login-page{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:linear-gradient(rgba(15,23,42,.22),rgba(15,23,42,.35)),url("/static/campus-dusk-background.png") center center/cover no-repeat;position:relative;overflow:hidden}
@@ -48,6 +49,19 @@ button,input,select{font:inherit}button{cursor:pointer}
 .info-box{margin-top:14px;padding:13px 15px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:11px;color:#1e3a8a;font-size:13px;line-height:1.5}.soft-box{padding:14px;background:#f8fafc;border:1px solid var(--line);border-radius:12px}.check-row{display:flex;gap:10px;align-items:flex-start}.check-row input{width:18px;height:18px;margin-top:2px}.check-row strong{font-size:13px}.check-row p{color:var(--muted);font-size:12px;margin-top:3px}
 .start-date-manager{margin-top:16px;padding:16px;background:#f8fafc;border:1px solid var(--line);border-radius:13px}.start-date-entry{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end}.date-action-btn{border:0;border-radius:8px;padding:7px 10px;background:#e0e7ff;color:#3730a3;font-size:12px;margin-right:5px}.mini-table{width:100%;border-collapse:collapse;margin-top:14px}.mini-table th,.mini-table td{padding:9px;border:1px solid var(--line);text-align:left;font-size:12px}.mini-table th{background:#f1f5f9;color:#334155}.holiday-picker{display:flex;gap:10px;align-items:end;flex-wrap:wrap}.holiday-tag{display:inline-flex;align-items:center;gap:8px;background:#fff1f2;color:#9f1239;border:1px solid #fecdd3;border-radius:999px;padding:7px 10px;font-size:12px;margin:10px 7px 0 0}.holiday-remove{border:0;background:transparent;color:#9f1239;padding:0;font-size:16px;width:auto;margin:0}
 .action-bar{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}.action-bar button{width:auto}.secondary-outline{background:white!important;color:#334155!important;border:1px solid #cbd5e1!important;box-shadow:none!important}.generate-btn{min-width:190px}
+
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  align-items: end;
+}
+
+@media (max-width: 700px) {
+  .grid-3 {
+    grid-template-columns: 1fr;
+  }
+}
 
 /* PROGRESS / STATUS */
 .progress-panel{display:none;margin-top:18px;padding:17px;background:#f8fafc;border:1px solid var(--line);border-radius:13px}.progress-title{font-weight:800;font-size:13px}.progress-track{height:9px;background:#e2e8f0;border-radius:99px;overflow:hidden;margin:12px 0}.progress-fill{height:100%;width:5%;background:linear-gradient(90deg,var(--primary),#8b5cf6);transition:width .5s}.progress-steps{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.progress-step{font-size:10px;color:#94a3b8}.progress-step.done{color:#166534;font-weight:700}.message{display:none;margin-top:15px;padding:13px 15px;border-radius:11px;font-size:13px;font-weight:700}.message.success{display:block;background:#ecfdf5;color:#166534;border:1px solid #bbf7d0}.message.error{display:block;background:#fef2f2;color:#991b1b;border:1px solid #fecaca}
