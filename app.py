@@ -230,24 +230,26 @@ def generate():
         if not year_match or (int(year_match.group(1)) + 1) % 100 != int(year_match.group(2)):
             return jsonify({"success": False, "error": "Academic year must look like 2026-27."}), 400
         
-selected_semester = (
-    request.form.get("semester", "Sem - 1").strip() or "Sem - 1"
-)
 
-semester_mapping = {
-    "Sem - 1": "Sem - I",
-    "Sem - 2": "Sem - II",
-    "Sem - I": "Sem - I",
-    "Sem - II": "Sem - II",
-}
+        selected_semester = (
+            request.form.get("semester", "Sem - 1").strip() or "Sem - 1"
+        )
 
-selected_semester = semester_mapping.get(selected_semester)
+        semester_mapping = {
+            "Sem - 1": "Sem - I",
+            "Sem - 2": "Sem - II",
+            "Sem - I": "Sem - I",
+            "Sem - II": "Sem - II",
+        }
 
-if selected_semester is None:
-    return jsonify({
-        "success": False,
-        "error": "Please select Sem - I or Sem - II."
-    }), 400
+        selected_semester = semester_mapping.get(selected_semester)
+
+        if selected_semester is None:
+            return jsonify({
+                "success": False,
+                "error": "Please select Sem - I or Sem - II."
+            }), 400
+
 
 
         mapping_text = request.form.get("course_year_start_dates", "{}")
@@ -396,59 +398,99 @@ def _load_timetable_meta():
         return None, None, "draft"
 
 
+
 def _read_timetable_sheets(file_path):
     """Read the main timetable sheet for PDF/Word without rerunning scheduling."""
     from openpyxl import load_workbook
+
     workbook = load_workbook(file_path, read_only=True, data_only=True)
+
     try:
-        worksheet = workbook["Timetable"] if "Timetable" in workbook.sheetnames else workbook.worksheets[0]
+        worksheet = (
+            workbook["Timetable"]
+            if "Timetable" in workbook.sheetnames
+            else workbook.worksheets[0]
+        )
+
         rows = []
         for row in worksheet.iter_rows(values_only=True):
-            values = ["" if value is None else str(value) for value in row]
+            values = [
+                "" if value is None else str(value)
+                for value in row
+            ]
+
             while values and not values[-1].strip():
                 values.pop()
+
             if any(value.strip() for value in values):
                 rows.append(values)
+
         if not rows:
             raise ValueError("The generated timetable workbook is empty.")
+
         headers = [value.strip() for value in rows[0]]
-        required = ["Day & Date", "Time", "Branch", "Class", "Sem", "Course Name", "Code", "Count"]
-        normalized = {name.casefold(): idx for idx, name in enumerate(headers)}
+
+        required = [
+            "Day & Date",
+            "Time",
+            "Branch",
+            "Class",
+            "Sem",
+            "Course Name",
+            "Code",
+            "Count",
+        ]
+
+        normalized = {
+            name.casefold(): idx
+            for idx, name in enumerate(headers)
+        }
+
         if all(name.casefold() in normalized for name in required):
-            indices = [normalized[name.casefold()] for name in required]
+            indices = [
+                normalized[name.casefold()]
+                for name in required
+            ]
+
             result = [required]
-            
-for row in rows[1:]:
-    output_row = [
-        row[i] if i < len(row) else ""
-        for i in indices
-    ]
+            sem_index = required.index("Sem")
 
-    # Convert the Sem column to Roman numerals in PDF/Word exports.
-    sem_index = required.index("Sem")
-    semester_value = output_row[sem_index].strip()
+            semester_mapping = {
+                "1": "I",
+                "2": "II",
+                "Sem - 1": "Sem - I",
+                "Sem - 2": "Sem - II",
+                "Sem - I": "Sem - I",
+                "Sem - II": "Sem - II",
+            }
 
-    semester_mapping = {
-        "1": "I",
-        "2": "II",
-        "Sem - 1": "Sem - I",
-        "Sem - 2": "Sem - II",
-        "Sem - I": "Sem - I",
-        "Sem - II": "Sem - II",
-    }
+            for row in rows[1:]:
+                output_row = [
+                    row[i] if i < len(row) else ""
+                    for i in indices
+                ]
 
-    output_row[sem_index] = semester_mapping.get(
-        semester_value, semester_value
-    )
+                semester_value = output_row[sem_index].strip()
 
-    result.append(output_row)
+                output_row[sem_index] = semester_mapping.get(
+                    semester_value,
+                    semester_value,
+                )
+
+                result.append(output_row)
 
         else:
-            # Keep the first eight source columns as a safe fallback for compatible workbooks.
-            result = [row[:8] + [""] * max(0, 8 - len(row[:8])) for row in rows]
+            # Keep the first eight source columns as a safe fallback.
+            result = [
+                row[:8] + [""] * max(0, 8 - len(row[:8]))
+                for row in rows
+            ]
+
         return [("Timetable", result)]
+
     finally:
         workbook.close()
+
 
 
 @app.route("/download/timetable.pdf")
