@@ -250,6 +250,29 @@ def _time_display(value):
     return parts[0] + "\nTo\n" + parts[1] if len(parts) == 2 else (value or "")
 
 
+def _clock_12h(value):
+    """'13:30' -> '01:30 PM'."""
+    return datetime.strptime(value, "%H:%M").strftime("%I:%M %p")
+
+
+def _slot_time_display(original, slot_times):
+    """Display text for the Time column using the administrator's timings.
+
+    The slot (morning/afternoon) is taken from the generated row's own time, so the
+    sort order and block grouping (which still use the original text) do not change."""
+    if not slot_times:
+        return _time_display(original)
+    match = re.match(r"\s*(\d{1,2})[.:](\d{2})\s*([ap]m)", original or "", re.I)
+    if not match:
+        return _time_display(original)
+    slot = "morning" if _time_minutes(original) < 12 * 60 else "afternoon"
+    try:
+        start, end = slot_times[slot]
+        return _clock_12h(start) + "\nTo\n" + _clock_12h(end)
+    except (KeyError, TypeError, ValueError):
+        return _time_display(original)
+
+
 SUMMARY_PROGRAMME = {"BTECH": "B.Tech.", "BCA": "B.C.A.", "MCA": "M.C.A.", "BBA": "B.B.A.",
                      "MBA": "M.B.A.", "MTECH": "M.Tech."}
 SUMMARY_YEAR = {1: "F.Y.", 2: "S.Y.", 3: "T.Y.", 4: "Final Yr.", 5: "Fifth Yr."}
@@ -335,7 +358,7 @@ def _header_info(dates, academic_year=None, semester=None, summary="", timetable
             "timetable_status": "Final Time Table" if str(timetable_status).lower() == "final" else "Draft Time Table"}
 
 
-def build_model(rows, academic_year=None, semester=None, timetable_status="draft", exam_type=None):
+def build_model(rows, academic_year=None, semester=None, timetable_status="draft", exam_type=None, slot_times=None):
     """rows: header row + 8 columns (Day & Date, Time, Branch, Class, Sem, Course Name, Code, Count)."""
     entries, dates = [], []
     for index, row in enumerate(rows[1:]):
@@ -357,7 +380,7 @@ def build_model(rows, academic_year=None, semester=None, timetable_status="draft
             "date_key": (parsed_date or date.max, raw_day),
             "time_key": _time_minutes(row[1]),
             "day_date": day_date,
-            "time": _time_display(row[1]),
+            "time": _slot_time_display(row[1], slot_times),
             "block_key": (raw_day, (row[1] or "").strip()),
             "branch": cell_branch,
             "sem": (row[4] or "").strip(),
