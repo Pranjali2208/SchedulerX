@@ -39,7 +39,14 @@ PROGRAMME_LABEL = dict(PROGRAMMES)
 UNCLASSIFIED = "UNCLASSIFIED"
 YEAR_RANK = {"first": 1, "second": 2, "third": 3, "fourth": 4, "final": 4, "fifth": 5}
 YEAR_NONE = 99
-YEAR_NAME = {1: "First", 2: "Second", 3: "Third", 4: "Final", 5: "Fifth"}
+
+YEAR_NAME = {
+    1: "F.Y.",
+    2: "S.Y.",
+    3: "T.Y.",
+    4: "Final",
+    5: "Fifth"
+}
 
 
 def _year_order(programme, year_rank):
@@ -198,7 +205,23 @@ def _classify(class_text, branch_text=""):
     for _, _, label in parsed:
         if label not in years:
             years.append(label)
-    return parsed[0][0], parsed[0][1], " & ".join(years) + " Year"
+
+        year_abbreviations = {
+            1: "F.Y.",
+            2: "S.Y.",
+            3: "T.Y.",
+            4: "Final Year",
+            5: "Fifth Year"
+        }
+
+        display_years = []
+        for _, rank, _ in parsed:
+            label = year_abbreviations.get(rank, "Year")
+            if label not in display_years:
+                display_years.append(label)
+
+        return parsed[0][0], parsed[0][1], " & ".join(display_years)
+
 
 
 def _parse_day_date(value):
@@ -343,8 +366,13 @@ def build_model(rows, academic_year=None, semester=None, timetable_status="draft
         years = sections[-1]["years"]
         if not years or years[-1]["rank"] != entry["year_rank"]:
             years.append({"rank": entry["year_rank"], "blocks": [],
-                          "label": (YEAR_NAME[entry["year_rank"]] + " Year") if entry["year_rank"] in YEAR_NAME
-                          else entry["year_label"]})
+                          
+        "label": (
+            YEAR_NAME[entry["year_rank"]]
+            if entry["year_rank"] in (1, 2, 3)
+            else YEAR_NAME[entry["year_rank"]] + " Year"
+        ) if entry["year_rank"] in YEAR_NAME else entry["year_label"]})
+
         blocks = years[-1]["blocks"]
         if not blocks or blocks[-1]["key"] != entry["block_key"]:
             blocks.append({"key": entry["block_key"], "day_date": entry["day_date"],
