@@ -15,11 +15,18 @@ load_dotenv()
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 INSTANCE_DIR = os.environ.get("REEXAM_INSTANCE_DIR") or os.path.join(BASE_DIR, "instance")
 GENERATED_DIR = os.path.join(BASE_DIR, "generated_schedules")
-META_FILE = os.path.join(GENERATED_DIR, "timetable_meta.json")
 ALLOWED_EXTENSIONS = {".xlsx", ".xls"}
 
 os.makedirs(INSTANCE_DIR, exist_ok=True)
 os.makedirs(GENERATED_DIR, exist_ok=True)
+
+
+def _generated_dir():
+    return os.path.join(app.root_path, "generated_schedules")
+
+
+def _meta_file():
+    return os.path.join(_generated_dir(), "timetable_meta.json")
 
 app = Flask(__name__, instance_path=INSTANCE_DIR)
 app.config.update(
@@ -80,19 +87,36 @@ def healthz():
 
 
 def _save_timetable_meta(meta):
-    with open(META_FILE, "w", encoding="utf-8") as fh:
+    with open(_meta_file(), "w", encoding="utf-8") as fh:
         json.dump(meta, fh)
 
 
 def _load_timetable_meta():
     """Return (academic_year, semester, exam_type, status) of the last generated timetable."""
     try:
-        with open(META_FILE, encoding="utf-8") as fh:
+        with open(_meta_file(), encoding="utf-8") as fh:
             meta = json.load(fh)
     except (OSError, ValueError):
         meta = {}
     return (meta.get("academic_year", ""), meta.get("semester", ""),
             meta.get("exam_type", ""), meta.get("timetable_status", "draft"))
+
+
+def _parse_clock(value):
+    """'HH:MM' (24h, from <input type=time>) -> 'HH:MM' or None."""
+    try:
+        return datetime.strptime((value or "").strip()[:5], "%H:%M").strftime("%H:%M")
+    except ValueError:
+        return None
+
+
+def _load_slot_times():
+    """Administrator-entered examination timings of the last generated timetable, or None."""
+    try:
+        with open(_meta_file(), encoding="utf-8") as fh:
+            return json.load(fh).get("slot_times")
+    except (OSError, ValueError):
+        return None
 
 
 @app.route("/generate", methods=["POST"])
@@ -145,6 +169,15 @@ def generate():
     except ValueError:
         holidays = []
 
+    slot_times = {}
+    for slot in ("morning", "afternoon"):
+        start, end = _parse_clock(form.get(slot + "_start")), _parse_clock(form.get(slot + "_end"))
+        if not start or not end:
+            return jsonify({"success": False, "error": "Please enter both the %s examination start time and end time." % slot.capitalize()}), 400
+        if end <= start:
+            return jsonify({"success": False, "error": "%s examination end time must be later than the start time." % slot.capitalize()}), 400
+        slot_times[slot] = [start, end]
+
     remove_labs = (form.get("remove_labs", "").lower() in ("1", "true", "yes", "on"))
     status = (form.get("timetable_status") or "draft").lower()
     sess = current_session() or {}
@@ -157,7 +190,7 @@ def generate():
         try:
             result = create_schedule(
                 path, start_date, morning_capacity=morning, afternoon_capacity=afternoon,
-                output_folder=GENERATED_DIR, holidays=holidays, remove_labs=remove_labs,
+                output_folder=_generated_dir(), holidays=holidays, remove_labs=remove_labs,
                 morning_student_capacity=morning_students,
                 afternoon_student_capacity=afternoon_students,
             )
@@ -171,7 +204,7 @@ def generate():
     semester = (form.get("semester") or "").strip()
     exam_type = (form.get("exam_type") or "").strip()
     _save_timetable_meta({"academic_year": academic_year, "semester": semester,
-                          "exam_type": exam_type, "timetable_status": status,
+                          "exam_type": exam_type, "timetable_status": status, "slot_times": slot_times,
                           "generated_at": datetime.now().isoformat(timespec="seconds")})
 
     return jsonify({
@@ -199,7 +232,7 @@ def generate():
 @app.route("/download/timetable")
 @login_required
 def download_timetable():
-    file_path = os.path.join(GENERATED_DIR, "generated_reexam_timetable.xlsx")
+    file_path = os.path.join(_generated_dir(), "generated_reexam_timetable.xlsx")
     if not os.path.exists(file_path):
         return "Timetable file not found. Please generate the timetable first.", 404
     return send_file(file_path, as_attachment=True, download_name="generated_reexam_timetable.xlsx")
@@ -272,7 +305,8 @@ def download_timetable_pdf():
             academic_year=academic_year,
             semester=semester,
             timetable_status=status,
-            exam_type=exam_type
+            exam_type=exam_type,
+            slot_times=_load_slot_times()
         )
         output = build_pdf(model)
         return send_file(output, mimetype="application/pdf", as_attachment=True,
@@ -297,7 +331,8 @@ def download_timetable_docx():
             academic_year=academic_year,
             semester=semester,
             timetable_status=status,
-            exam_type=exam_type
+            exam_type=exam_type,
+            slot_times=_load_slot_times()
         )
         output = build_docx(model)
         return send_file(output, mimetype="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
