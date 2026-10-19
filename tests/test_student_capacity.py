@@ -193,6 +193,8 @@ class EndToEndTests(unittest.TestCase):
             "course_year_start_dates": '{"B.Tech|Second Year": "2026-10-26"}',
             "morning_papers": "5", "afternoon_papers": "4",
             "remove_labs": "false", "holiday_dates": "[]",
+            "morning_start": "10:30", "morning_end": "13:30",
+            "afternoon_start": "14:30", "afternoon_end": "17:30",
         }
         data.update(extra)
         return client.post("/generate", data=data,
@@ -216,6 +218,50 @@ class EndToEndTests(unittest.TestCase):
             r = self._post(client)  # blank = legacy behaviour
             self.assertEqual(r.status_code, 200)
             self.assertIsNone(r.get_json()["morning_student_capacity"])
+
+
+class ExamTimingTests(EndToEndTests):
+    """Administrator-entered morning/afternoon timings reach the PDF and Word downloads."""
+
+    def _pdf_text(self, client):
+        import subprocess
+        r = client.get("/download/timetable.pdf")
+        self.assertEqual(r.status_code, 200)
+        with tempfile.NamedTemporaryFile(suffix=".pdf") as fh:
+            fh.write(r.data); fh.flush()
+            return subprocess.run(["pdftotext", "-layout", fh.name, "-"], capture_output=True, text=True).stdout
+
+    def _docx_text(self, client):
+        import docx
+        r = client.get("/download/timetable.docx")
+        self.assertEqual(r.status_code, 200)
+        d = docx.Document(io.BytesIO(r.data))
+        return "\n".join(c.text for t in d.tables for row in t.rows for c in row.cells)
+
+    def test_invalid_or_missing_times_rejected(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            client = self._client(tmp)
+            for extra in ({"morning_start": ""}, {"afternoon_end": ""}, {"morning_end": "10:30"},
+                          {"afternoon_start": "17:30", "afternoon_end": "14:30"}, {"morning_start": "xx"}):
+                r = self._post(client, **extra)
+                self.assertEqual(r.status_code, 400, extra)
+                self.assertIn("examination", r.get_json()["error"])
+
+    def test_times_appear_in_pdf_and_docx(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            client = self._client(tmp)
+            r = self._post(client, morning_start="09:15", morning_end="12:00",
+                           afternoon_start="14:00", afternoon_end="17:00")
+            self.assertEqual(r.status_code, 200, r.get_json())
+            for text in (self._pdf_text(client), self._docx_text(client)):
+                self.assertIn("09:15 AM", text); self.assertIn("12:00 PM", text)
+                self.assertIn("02:00 PM", text); self.assertIn("05:00 PM", text)
+                self.assertNotIn("10:30", text); self.assertNotIn("05:30 PM", text)
+            r = self._post(client, morning_start="08:00", morning_end="11:00",
+                           afternoon_start="13:00", afternoon_end="16:00")
+            self.assertEqual(r.status_code, 200)
+            text = self._pdf_text(client)
+            self.assertIn("08:00 AM", text); self.assertNotIn("09:15 AM", text)
 
 
 if __name__ == "__main__":
