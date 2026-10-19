@@ -231,6 +231,7 @@ def generate():
             return jsonify({"success": False, "error": "Academic year must look like 2026-27."}), 400
         
 
+
         selected_semester = (
             request.form.get("semester", "Sem - 1").strip() or "Sem - 1"
         )
@@ -240,6 +241,9 @@ def generate():
             "Sem - 2": "Sem - II",
             "Sem - I": "Sem - I",
             "Sem - II": "Sem - II",
+            "Sem I": "Sem - I",
+            "Sem II": "Sem - II",
+            "Sem I & Sem II": "Sem I & Sem II",
         }
 
         selected_semester = semester_mapping.get(selected_semester)
@@ -247,8 +251,9 @@ def generate():
         if selected_semester is None:
             return jsonify({
                 "success": False,
-                "error": "Please select Sem - I or Sem - II."
+                "error": "Please select Sem - I, Sem - II, or Sem I & Sem II."
             }), 400
+
 
 
 
