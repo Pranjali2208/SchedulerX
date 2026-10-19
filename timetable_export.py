@@ -303,7 +303,18 @@ def summary_layout(text):
 
 
 DEFAULT_ACADEMIC_YEAR = "2026-27"
-DEFAULT_SEMESTER = "Sem - 1"
+DEFAULT_SEMESTER = "Sem I"
+
+
+def _format_semester(value):
+    """Normalise 'Sem - 1' / 'Sem - 2' / 'Sem I & Sem II' to 'Sem I' / 'Sem II' style."""
+    text = (value or "").strip()
+    if not text:
+        return DEFAULT_SEMESTER
+    roman = {"1": "I", "2": "II", "i": "I", "ii": "II"}
+    def one(m):
+        return "Sem " + roman.get(m.group(1).lower(), m.group(1).upper())
+    return re.sub(r"(?i)\bsem(?:ester)?\s*[-.:]?\s*(1|2|ii|i)\b", one, text)
 
 
 def _header_info(dates, academic_year=None, semester=None, summary="", timetable_status="draft"):
@@ -311,7 +322,7 @@ def _header_info(dates, academic_year=None, semester=None, summary="", timetable
     lines, size = summary_layout(summary)
     return {"summary_lines": lines, "summary_size": size,
             "academic_year": (academic_year or "").strip() or DEFAULT_ACADEMIC_YEAR,
-            "semester": (semester or "").strip() or DEFAULT_SEMESTER,
+            "semester": _format_semester(semester),
             "prepared_date": today.strftime("%d/%m/%Y"),
             "timetable_status": "Final Time Table" if str(timetable_status).lower() == "final" else "Draft Time Table"}
 
