@@ -229,9 +229,26 @@ def generate():
         year_match = re.fullmatch(r"(\d{4})-(\d{2})", academic_session)
         if not year_match or (int(year_match.group(1)) + 1) % 100 != int(year_match.group(2)):
             return jsonify({"success": False, "error": "Academic year must look like 2026-27."}), 400
-        selected_semester = request.form.get("semester", "Sem - 1").strip() or "Sem - 1"
-        if selected_semester not in ("Sem - 1", "Sem - 2"):
-            return jsonify({"success": False, "error": "Please select Sem - 1 or Sem - 2."}), 400
+        
+selected_semester = (
+    request.form.get("semester", "Sem - 1").strip() or "Sem - 1"
+)
+
+semester_mapping = {
+    "Sem - 1": "Sem - I",
+    "Sem - 2": "Sem - II",
+    "Sem - I": "Sem - I",
+    "Sem - II": "Sem - II",
+}
+
+selected_semester = semester_mapping.get(selected_semester)
+
+if selected_semester is None:
+    return jsonify({
+        "success": False,
+        "error": "Please select Sem - I or Sem - II."
+    }), 400
+
 
         mapping_text = request.form.get("course_year_start_dates", "{}")
         try:
@@ -400,8 +417,32 @@ def _read_timetable_sheets(file_path):
         if all(name.casefold() in normalized for name in required):
             indices = [normalized[name.casefold()] for name in required]
             result = [required]
-            for row in rows[1:]:
-                result.append([row[i] if i < len(row) else "" for i in indices])
+            
+for row in rows[1:]:
+    output_row = [
+        row[i] if i < len(row) else ""
+        for i in indices
+    ]
+
+    # Convert the Sem column to Roman numerals in PDF/Word exports.
+    sem_index = required.index("Sem")
+    semester_value = output_row[sem_index].strip()
+
+    semester_mapping = {
+        "1": "I",
+        "2": "II",
+        "Sem - 1": "Sem - I",
+        "Sem - 2": "Sem - II",
+        "Sem - I": "Sem - I",
+        "Sem - II": "Sem - II",
+    }
+
+    output_row[sem_index] = semester_mapping.get(
+        semester_value, semester_value
+    )
+
+    result.append(output_row)
+
         else:
             # Keep the first eight source columns as a safe fallback for compatible workbooks.
             result = [row[:8] + [""] * max(0, 8 - len(row[:8])) for row in rows]
