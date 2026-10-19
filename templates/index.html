@@ -51,16 +51,27 @@ button,input,select{font:inherit}button{cursor:pointer}
 .action-bar{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}.action-bar button{width:auto}.secondary-outline{background:white!important;color:#334155!important;border:1px solid #cbd5e1!important;box-shadow:none!important}.generate-btn{min-width:190px}
 
 .grid-3 {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
-  align-items: end;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    align-items: start;
+}
+
+.grid-3 .field {
+    min-width: 0;
+    width: 100%;
+}
+
+.grid-3 select,
+.grid-3 input {
+    width: 100%;
+    box-sizing: border-box;
 }
 
 @media (max-width: 700px) {
-  .grid-3 {
-    grid-template-columns: 1fr;
-  }
+    .grid-3 {
+        grid-template-columns: 1fr;
+    }
 }
 
 /* PROGRESS / STATUS */
@@ -297,18 +308,29 @@ button,input,select{font:inherit}button{cursor:pointer}
       </div>
 
       
+
 <div class="grid-3">
-  <div class="field" style="margin:0">
-    <label for="academicYear">Academic Year</label>
-    <!-- Keep your existing academic year input here -->
+  <div class="select-field" style="margin-top:0">
+    <label for="academicYearSelect">Academic Year</label>
+    <select class="input-control" id="academicYearSelect">
+      <option value="2026-27" selected>2026–2027</option>
+      <option value="2025-26">2025–2026</option>
+      <option value="2024-25">2024–2025</option>
+      <option value="2023-24">2023–2024</option>
+      <option value="2022-23">2022–2023</option>
+    </select>
   </div>
 
-  <div class="field" style="margin:0">
+  <div class="select-field" style="margin-top:0">
     <label for="semesterSelect">Semester</label>
-    <!-- Keep your existing semester dropdown here -->
+    <select class="input-control" id="semesterSelect">
+      <option value="Sem - 1" selected>Sem I</option>
+      <option value="Sem - 2">Sem II</option>
+      <option value="Sem I & Sem II">Sem I & Sem II</option>
+    </select>
   </div>
 
-  <div class="field" style="margin:0">
+  <div class="select-field" style="margin-top:0">
     <label for="examType">Exam Type</label>
     <select class="input-control" id="examType">
       <option value="ESE" selected>ESE</option>
@@ -316,6 +338,7 @@ button,input,select{font:inherit}button{cursor:pointer}
     </select>
   </div>
 </div>
+
       
       <div class="grid-2">
         <div class="select-field"><label>Select Course</label><select id="courseSelect"><option value="">Select Course</option><option value="B.Tech">B.Tech (4 Year)</option><option value="M.Tech">M.Tech (2 Year)</option><option value="BCA">BCA (4 Year)</option><option value="MCA">MCA (2 Year)</option><option value="BBA">BBA (4 Year)</option><option value="MBA">MBA (2 Year)</option></select></div>
