@@ -153,6 +153,38 @@ button,input,select{font:inherit}button{cursor:pointer}
 .accounts-table tr:last-child td{border-bottom:0}
 .account-status{display:inline-block;border-radius:99px;padding:5px 8px;background:#ecfdf5;color:#166534;font-size:10px;font-weight:800}
 
+
+/* ===== DASHBOARD POLISH ===== */
+:root{--shadow:0 1px 2px rgba(15,23,42,.04),0 8px 24px rgba(15,23,42,.06)}
+body{background:radial-gradient(1100px 500px at 85% -10%,#e0e7ff 0,transparent 60%),#f4f7fb}
+.main{max-width:1500px}
+.sidebar{box-shadow:6px 0 30px rgba(15,23,42,.18);overflow-y:auto}
+.sidebar li{border-radius:12px;transition:.2s}.sidebar li:hover{background:rgba(255,255,255,.09);transform:translateX(3px)}
+.topbar h1{letter-spacing:-.5px}
+.hero{position:relative;overflow:hidden;padding:30px 32px}
+.hero:after{content:"";position:absolute;right:-60px;top:-80px;width:280px;height:280px;border-radius:50%;background:rgba(255,255,255,.08)}
+.hero:before{content:"";position:absolute;right:120px;bottom:-110px;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,.06)}
+.hero>*{position:relative;z-index:1}
+.cards{grid-template-columns:repeat(4,minmax(0,1fr))}
+.card{position:relative;overflow:hidden;display:flex;flex-direction:column;transition:.2s}
+.card:hover{transform:translateY(-3px);box-shadow:0 14px 32px rgba(79,70,229,.14)}
+.card:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(180deg,#6366f1,#8b5cf6)}
+.panel{border-radius:20px;padding:26px;transition:box-shadow .2s}
+.panel-head{padding-bottom:14px;border-bottom:1px solid var(--line);margin-bottom:20px}
+.panel-head h2{letter-spacing:-.2px}
+.upload-zone{padding:34px;background:linear-gradient(180deg,#f8faff,#eef2ff);margin-bottom:6px}
+.upload-zone:hover{border-color:var(--primary);background:#eef2ff}
+.config-row{margin:18px 0 0!important;align-items:end}
+.config-row .select-field{margin:0!important}
+.config-row label{margin-bottom:7px}
+.select-field select,.input-control,.field input{transition:border-color .2s,box-shadow .2s}
+.select-field select:focus,.input-control:focus{border-color:var(--primary);box-shadow:0 0 0 4px rgba(99,102,241,.14);outline:none}
+.start-date-manager,.soft-box{background:linear-gradient(180deg,#fbfcff,#f4f6fb)}
+.workflow-item{transition:.2s}.workflow-item:hover{transform:translateY(-2px);border-color:#c7d2fe;background:#fff}
+.action-bar{padding-top:18px;border-top:1px solid var(--line);margin-top:24px}
+.generate-btn{padding:14px 24px}
+.toast{bottom:24px;right:24px}
+@media(max-width:1100px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.config-row{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -310,6 +342,7 @@ button,input,select{font:inherit}button{cursor:pointer}
       
 
 
+<div class="grid-3 config-row">
 <div class="select-field" style="margin-top:0">
   <label for="academicYearSelect">Academic Year</label>
   <select class="input-control" id="academicYearSelect">
@@ -345,6 +378,7 @@ button,input,select{font:inherit}button{cursor:pointer}
       Re-Examination (Re-exam)
     </option>
   </select>
+</div>
 </div>
 
 
