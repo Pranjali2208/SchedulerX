@@ -381,7 +381,39 @@ button,input,select{font:inherit}button{cursor:pointer}
 })();
 </script>
 <script>
-const courseYearOptions={"B.Tech":[["1st year","1st Year"],["2nd year","2nd Year"],["3rd year","3rd Year"],["final year","Final Year"]],"M.Tech":[["1st year","1st Year"],["final year","Final Year"]],"BCA":[["1st year","1st Year"],["2nd year","2nd Year"],["3rd year","3rd Year"],["final year","Final Year"]],"MCA":[["1st year","1st Year"],["final year","Final Year"]],"BBA":[["1st year","1st Year"],["2nd year","2nd Year"],["3rd year","3rd Year"],["final year","Final Year"]],"MBA":[["1st year","1st Year"],["final year","Final Year"]]};
+
+const courseYearOptions = {
+  "B.Tech": [
+    ["1st year", "F.Y."],
+    ["2nd year", "S.Y."],
+    ["3rd year", "T.Y."],
+    ["final year", "Final Year"]
+  ],
+  "M.Tech": [
+    ["1st year", "F.Y."],
+    ["final year", "Final Year"]
+  ],
+  "BCA": [
+    ["1st year", "F.Y."],
+    ["2nd year", "S.Y."],
+    ["3rd year", "T.Y."],
+    ["final year", "Final Year"]
+  ],
+  "MCA": [
+    ["1st year", "F.Y."],
+    ["final year", "Final Year"]
+  ],
+  "BBA": [
+    ["1st year", "F.Y."],
+    ["2nd year", "S.Y."],
+    ["3rd year", "T.Y."],
+    ["final year", "Final Year"]
+  ],
+  "MBA": [
+    ["1st year", "F.Y."],
+    ["final year", "Final Year"]
+  ]
+};
 let selectedHolidays=[];let courseYearStartDates={};
 try{courseYearStartDates=JSON.parse(localStorage.getItem("reexamCourseYearStartDates")||"{}")}catch(e){courseYearStartDates={}}
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2600)}
