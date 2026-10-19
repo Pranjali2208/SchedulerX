@@ -317,13 +317,21 @@ def _format_semester(value):
     return re.sub(r"(?i)\bsem(?:ester)?\s*[-.:]?\s*(1|2|ii|i)\b", one, text)
 
 
-def _header_info(dates, academic_year=None, semester=None, summary="", timetable_status="draft"):
+def _exam_title(exam_type):
+    text = (exam_type or "").strip().lower()
+    if any(k in text for k in ("re-exam", "re exam", "reexam")):
+        return "Re-Examination (Re-exam)"
+    return "End Semester Examination (ESE)"
+
+
+def _header_info(dates, academic_year=None, semester=None, summary="", timetable_status="draft", exam_type=None):
     today = date.today()
     lines, size = summary_layout(summary)
     return {"summary_lines": lines, "summary_size": size,
             "academic_year": (academic_year or "").strip() or DEFAULT_ACADEMIC_YEAR,
             "semester": _format_semester(semester),
             "prepared_date": today.strftime("%d/%m/%Y"),
+            "exam_title": _exam_title(exam_type),
             "timetable_status": "Final Time Table" if str(timetable_status).lower() == "final" else "Draft Time Table"}
 
 
@@ -398,7 +406,7 @@ def build_model(rows, academic_year=None, semester=None, timetable_status="draft
                 year["title"] = f"{section['heading']} - Year not specified"
             else:
                 year["title"] = f"{section['heading']} - {year['label']}"
-    return {"header": _header_info(dates, academic_year, semester, build_summary(summary_groups), timetable_status), "sections": sections, "total": len(entries)}
+    return {"header": _header_info(dates, academic_year, semester, build_summary(summary_groups), timetable_status, exam_type), "sections": sections, "total": len(entries)}
 
 
 def count_entries(model):
@@ -458,7 +466,7 @@ def build_pdf(model):
             self.setFont("Courier-Bold", 8)
             self.drawCentredString(page_w / 2, page_h - 76, "=" * 88)
             # Title with the underlined phrase
-            pre, mid = info["timetable_status"] + ": -", "End Semester Examination (ESE)"
+            pre, mid = info["timetable_status"] + ": -", info["exam_title"]
             post = ""
             font, size = "Times-Bold", 16.5
             w_pre, w_mid, w_post = (stringWidth(t, font, size) for t in (pre, mid, post))
@@ -659,7 +667,7 @@ def build_docx(model):
         return par
 
     header_line([("=" * 88, dict(name="Courier New", size=8, bold=True))], before=4)
-    pre, mid = info["timetable_status"] + ": -", "End Semester Examination (ESE)"
+    pre, mid = info["timetable_status"] + ": -", info["exam_title"]
     post = ""
     tnr = dict(name="Times New Roman", size=16.5, bold=True)
     header_line([(pre, tnr), (mid, dict(tnr, underline=True)), (post, tnr)], before=2)
